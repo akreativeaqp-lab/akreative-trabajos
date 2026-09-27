@@ -42,7 +42,7 @@
         }
 
         .welcome h1 {
-            font-size: 32px;
+            font-size: 24px;
             margin-bottom: 8px;
         }
 
@@ -62,6 +62,31 @@
             font-size: 18px;
             margin-bottom: 15px;
         }
+
+        .home-nav-card {
+            cursor: pointer;
+        }
+
+        .home-nav-card h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0;
+        }
+
+        .home-nav-icon, .ak-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            flex: 0 0 20px;
+            color: #fff;
+            vertical-align: -4px;
+        }
+
+        .ak-icon { width: 17px; height: 17px; flex-basis: 17px; vertical-align: -3px; }
+        .ak-icon svg, .home-nav-icon svg { width: 100%; height: 100%; }
+        .ak-icon svg *, .home-nav-icon svg * { vector-effect: non-scaling-stroke; }
+
 
         .summary {
             color: #aaaab2;
@@ -894,8 +919,8 @@ body::before {
   background-size:cover;
   background-position:center top;
   background-repeat:no-repeat;
-  opacity:.48;
-  filter:grayscale(100%) brightness(.55) contrast(.92);
+  opacity:.74;
+  filter:grayscale(100%) brightness(.68) contrast(.98);
   pointer-events:none;
 }
 body::after {
@@ -903,7 +928,7 @@ body::after {
   position:fixed;
   inset:0;
   z-index:0;
-  background:rgba(0,0,0,.28);
+  background:rgba(0,0,0,.14);
   pointer-events:none;
 }
 .app { position:relative; z-index:1; }
@@ -961,29 +986,24 @@ body::after {
         </div>
 
 
-        <div class="home-card" style="cursor:pointer;" onclick="openSection('retouches')">
-            <h2>📸 RETOQUE DE FOTOS</h2>
-            <div class="summary">Sesiones pendientes, fechas de retoque y entregas.</div>
+        <div class="home-card home-nav-card" onclick="openSection('retouches')">
+            <h2><span class="home-nav-icon" data-ak-icon="camera"></span> RETOQUE</h2>
         </div>
 
-        <div class="home-card" style="cursor:pointer;" onclick="openSection('designs')">
-            <h2>🎨 DISEÑOS</h2>
-            <div class="summary">Portadas, flyers, logos e imprenta.</div>
+        <div class="home-card home-nav-card" onclick="openSection('designs')">
+            <h2><span class="home-nav-icon" data-ak-icon="palette"></span> DISEÑOS</h2>
         </div>
 
-        <div class="home-card" style="cursor:pointer;" onclick="openSection('videos')">
-            <h2>🎬 VIDEOS</h2>
-            <div class="summary">Videoclips, promocionales, flyers y sociales.</div>
+        <div class="home-card home-nav-card" onclick="openSection('videos')">
+            <h2><span class="home-nav-icon" data-ak-icon="video"></span> VIDEOS</h2>
         </div>
 
-        <div class="home-card" style="cursor:pointer;" onclick="openSection('history')">
-            <h2>📚 HISTORIAL</h2>
-            <div class="summary">Todos tus trabajos terminados, en un solo lugar.</div>
+        <div class="home-card home-nav-card" onclick="openSection('history')">
+            <h2><span class="home-nav-icon" data-ak-icon="history"></span> HISTORIAL</h2>
         </div>
 
         <div class="home-card">
-            <h2>🔎 BUSCAR TRABAJO</h2>
-            <div class="summary">Busca por nombre del artista o trabajo, incluso entre los terminados.</div>
+            <h2><span class="home-nav-icon" data-ak-icon="search"></span> BUSCAR TRABAJO</h2>
             <div class="search-box-wrap">
                 <input id="globalSearch" class="global-search" type="search" placeholder="Ej. PRUEBA 1, Grupo X..." autocomplete="off" oninput="searchAllJobs()">
                 <div id="globalSearchResults" class="search-results"></div>
@@ -1005,7 +1025,7 @@ body::after {
     <!-- HISTORIAL -->
     <section id="history" class="section">
         <div class="section-header">
-            <button class="back-button" onclick="goHome()">←</button>
+            <button class="back-button" onclick="goBackInApp()">←</button>
             <h2>📚 HISTORIAL</h2>
         </div>
 
@@ -1041,7 +1061,7 @@ body::after {
         <div class="section-header">
             <h2>📸 Retoque de fotos</h2>
 
-            <button class="back-button" onclick="goHome()">
+            <button class="back-button" onclick="goBackInApp()">
                 ← Inicio
             </button>
         </div>
@@ -1059,7 +1079,7 @@ body::after {
     <section id="designs" class="section">
         <div class="section-header">
             <h2>🎨 Diseños</h2>
-            <button class="back-button" onclick="goHome()">← Inicio</button>
+            <button class="back-button" onclick="goBackInApp()">← Inicio</button>
         </div>
 
         <button class="new-button" onclick="showNewDesign()">＋ NUEVO DISEÑO</button>
@@ -1110,7 +1130,7 @@ body::after {
     <section id="videos" class="section">
         <div class="section-header">
             <h2>🎬 Videos</h2>
-            <button class="back-button" onclick="goHome()">← Inicio</button>
+            <button class="back-button" onclick="goBackInApp()">← Inicio</button>
         </div>
 
         <button class="new-button" onclick="showNewVideo()">＋ NUEVO VIDEO</button>
@@ -1227,70 +1247,22 @@ body::after {
 
 
             <div class="suggestion">
-
                 <div class="suggestion-title">
-                    🧠 AKREATIVE TE PROPONE
+                    <span class="ak-icon" data-ak-icon="brain"></span> AKREATIVE TE PROPONE
                 </div>
-
                 <div>
-                    🖥️ Retoque:
-                    <strong id="suggestedRetouch">
-                        -
-                    </strong>
+                    <span class="ak-icon" data-ak-icon="calendar"></span> Entrega:
+                    <strong id="suggestedDelivery">-</strong>
                 </div>
-
-                <div style="margin-top:8px;">
-                    📤 Entrega:
-                    <strong id="suggestedDelivery">
-                        -
-                    </strong>
-                </div>
-
             </div>
-
 
             <div class="field">
-                <label>📅 Día de retoque</label>
-
+                <label>Fecha de entrega</label>
                 <div class="date-field">
-                    <input
-                        type="date"
-                        id="retouchDate"
-                        class="date-input"
-                        onchange="updateDeliveryFromRetouch()"
-                    >
-                    <span class="date-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                    </span>
+                    <input type="date" id="deliveryDate" class="date-input">
+                    <span class="date-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
                 </div>
             </div>
-
-
-            <div class="field">
-                <label>📤 Fecha de entrega</label>
-
-                <div class="date-field">
-                    <input
-                        type="date"
-                        id="deliveryDate"
-                        class="date-input"
-                    >
-                    <span class="date-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                    </span>
-                </div>
-            </div>
-
 
             <div class="form-buttons">
 
@@ -1398,39 +1370,63 @@ body::after {
     // -----------------------------
     // NAVEGACIÓN
     // -----------------------------
+    let akNavigationStack = [];
+    let akCurrentSection = "home";
 
-    function openSection(sectionId) {
+    function openSection(sectionId, fromHistory = false) {
+        const target = document.getElementById(sectionId);
+        if (!target) return;
 
-        document.getElementById("home").style.display = "none";
-
-        document.querySelectorAll(".section")
-            .forEach(section => section.classList.remove("active"));
-
-        document.getElementById(sectionId)
-            .classList.add("active");
-
-        if (sectionId === "retouches") {
-            renderRetouches();
+        if (!fromHistory && akCurrentSection !== sectionId) {
+            akNavigationStack.push(akCurrentSection);
+            history.pushState({ akreativeSection: sectionId }, "", "#" + sectionId);
         }
-        if (sectionId === "designs") {
-            renderDesigns();
-        }
-        if (sectionId === "videos") {
-            renderVideos();
+
+        akCurrentSection = sectionId;
+        document.getElementById("home").style.display = sectionId === "home" ? "block" : "none";
+        document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+        if (sectionId !== "home") target.classList.add("active");
+
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+
+        if (sectionId === "retouches") renderRetouches();
+        if (sectionId === "designs") renderDesigns();
+        if (sectionId === "videos") renderVideos();
+        if (sectionId === "history") renderHistory();
+    }
+
+    function goBackInApp() {
+        if (akNavigationStack.length) {
+            const previous = akNavigationStack.pop();
+            history.replaceState({ akreativeSection: previous }, "", previous === "home" ? "#home" : "#" + previous);
+            openSection(previous, true);
+        } else {
+            goHome();
         }
     }
 
-
     function goHome() {
-
-        document.querySelectorAll(".section")
-            .forEach(section => section.classList.remove("active"));
-
+        akNavigationStack = [];
+        history.replaceState({ akreativeSection: "home" }, "", "#home");
+        akCurrentSection = "home";
+        document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
         document.getElementById("home").style.display = "block";
-
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
         updateTodaySummary();
         updateDashboardSummary();
     }
+
+    window.addEventListener("popstate", () => {
+        if (akNavigationStack.length) {
+            const previous = akNavigationStack.pop();
+            openSection(previous, true);
+        } else {
+            goHome();
+        }
+    });
+
 
 
     // -----------------------------
@@ -1798,74 +1794,25 @@ body::after {
     }
 
 
-    function findNextFreeRetouchDate() {
-
+    function findNextFreeDeliveryDate() {
         let candidate = addDays(new Date(), 1);
-
         while (true) {
-
-            const candidateString =
-                formatDateInput(candidate);
-
-            const occupied =
-                retouches.some(job =>
-                    !job.completed &&
-                    (job.retouchDate === candidateString ||
-                     job.deliveryDate === candidateString)
-                );
-
-            if (!occupied) {
-                return candidate;
-            }
-
+            const candidateString = formatDateInput(candidate);
+            const occupied = retouches.some(job =>
+                !job.completed &&
+                (job.deliveryDate === candidateString || job.retouchDate === candidateString)
+            );
+            if (!occupied) return candidate;
             candidate = addDays(candidate, 1);
         }
     }
 
-
     function calculateSuggestedDates() {
-
-        const suggestedRetouch =
-            findNextFreeRetouchDate();
-
-        const suggestedDelivery =
-            addDays(suggestedRetouch, 1);
-
-        document.getElementById("suggestedRetouch")
-            .textContent =
-            formatPrettyDate(suggestedRetouch);
-
-        document.getElementById("suggestedDelivery")
-            .textContent =
-            formatPrettyDate(suggestedDelivery);
-
-        document.getElementById("retouchDate")
-            .value =
-            formatDateInput(suggestedRetouch);
-
-        document.getElementById("deliveryDate")
-            .value =
-            formatDateInput(suggestedDelivery);
+        const suggestedDelivery = findNextFreeDeliveryDate();
+        document.getElementById("suggestedDelivery").textContent = formatPrettyDate(suggestedDelivery);
+        document.getElementById("deliveryDate").value = formatDateInput(suggestedDelivery);
     }
 
-
-    function updateDeliveryFromRetouch() {
-
-        const value =
-            document.getElementById("retouchDate").value;
-
-        if (!value) return;
-
-        const date =
-            new Date(value + "T12:00:00");
-
-        const delivery =
-            addDays(date, 1);
-
-        document.getElementById("deliveryDate")
-            .value =
-            formatDateInput(delivery);
-    }
 
 
     function formatPrettyDate(date) {
@@ -1885,75 +1832,42 @@ body::after {
     // -----------------------------
 
     function saveRetouch() {
+        const artist = document.getElementById("artistName").value.trim();
+        const sessionDate = document.getElementById("sessionDate").value;
+        const deliveryDate = document.getElementById("deliveryDate").value;
 
-        const artist =
-            document.getElementById("artistName")
-                .value.trim();
-
-        const sessionDate =
-            document.getElementById("sessionDate")
-                .value;
-
-        const retouchDate =
-            document.getElementById("retouchDate")
-                .value;
-
-        const deliveryDate =
-            document.getElementById("deliveryDate")
-                .value;
-
-        if (!artist) {
-            alert("Escribe el nombre del artista.");
-            return;
-        }
-
-        if (!retouchDate || !deliveryDate) {
-            alert("Selecciona las fechas.");
-            return;
-        }
+        if (!artist) { alert("Escribe el nombre del artista."); return; }
+        if (!deliveryDate) { alert("Selecciona la fecha de entrega."); return; }
 
         if (editingRetouchId !== null) {
-
-            const job =
-                retouches.find(item => item.id === editingRetouchId);
-
+            const job = retouches.find(item => item.id === editingRetouchId);
             if (!job) return;
-
             job.artist = artist;
             job.sessionDate = sessionDate;
             job.photos = photos;
-            job.retouchDate = retouchDate;
+            job.retouchDate = deliveryDate;
             job.deliveryDate = deliveryDate;
-
-            localStorage.setItem(
-                "akreativeRetouches",
-                JSON.stringify(retouches)
-            );
-
+            localStorage.setItem("akreativeRetouches", JSON.stringify(retouches));
             editingRetouchId = null;
-
-            alert("✅ Cambios guardados.");
-
+            alert("Cambios guardados.");
             openSection("retouches");
             return;
         }
 
         const newJob = {
             id: Date.now(),
-            artist: artist,
-            sessionDate: sessionDate,
-            photos: photos,
-            retouchDate: retouchDate,
-            deliveryDate: deliveryDate,
+            artist,
+            sessionDate,
+            photos,
+            retouchDate: deliveryDate,
+            deliveryDate,
             completed: false
         };
-
         retouches.push(newJob);
 
-        // Cada sesión crea automáticamente su portada de obsequio.
         designs.push({
             id: Date.now() + 1,
-            artist: artist,
+            artist,
             type: "portada",
             createdAt: formatDateInput(new Date()),
             sessionDate: sessionDate || formatDateInput(new Date()),
@@ -1963,65 +1877,28 @@ body::after {
             sourceRetouchId: newJob.id
         });
 
-        localStorage.setItem(
-            "akreativeRetouches",
-            JSON.stringify(retouches)
-        );
-        localStorage.setItem(
-            "akreativeDesigns",
-            JSON.stringify(designs)
-        );
-
-        alert("✅ Retoque agregado a tu agenda.");
-
+        localStorage.setItem("akreativeRetouches", JSON.stringify(retouches));
+        localStorage.setItem("akreativeDesigns", JSON.stringify(designs));
+        alert("Retoque agregado a tu agenda.");
         openSection("retouches");
     }
 
 
     function editRetouch(id) {
-
-        const job =
-            retouches.find(item => item.id === id);
-
+        const job = retouches.find(item => item.id === id);
         if (!job) return;
-
         editingRetouchId = id;
-
-        document.getElementById("retouchFormTitle")
-            .textContent = "Editar retoque";
-
-        document.getElementById("saveRetouchText")
-            .textContent = "GUARDAR CAMBIOS";
-
-        document.getElementById("artistName")
-            .value = job.artist || "";
-
-        document.getElementById("sessionDate")
-            .value = job.sessionDate || formatDateInput(new Date());
-
+        document.getElementById("retouchFormTitle").textContent = "Editar retoque";
+        document.getElementById("saveRetouchText").textContent = "GUARDAR CAMBIOS";
+        document.getElementById("artistName").value = job.artist || "";
+        document.getElementById("sessionDate").value = job.sessionDate || formatDateInput(new Date());
         photos = Number(job.photos) || 8;
-
-        document.getElementById("photoNumber")
-            .textContent = photos;
-
-        document.getElementById("retouchDate")
-            .value = job.retouchDate || "";
-
-        document.getElementById("deliveryDate")
-            .value = job.deliveryDate || "";
-
-        document.getElementById("suggestedRetouch")
-            .textContent = job.retouchDate
-                ? formatDateText(job.retouchDate)
-                : "-";
-
-        document.getElementById("suggestedDelivery")
-            .textContent = job.deliveryDate
-                ? formatDateText(job.deliveryDate)
-                : "-";
-
+        document.getElementById("photoNumber").textContent = photos;
+        document.getElementById("deliveryDate").value = job.deliveryDate || job.retouchDate || "";
+        document.getElementById("suggestedDelivery").textContent = (job.deliveryDate || job.retouchDate) ? formatDateText(job.deliveryDate || job.retouchDate) : "-";
         openSection("newRetouch");
     }
+
 
     function cancelRetouchForm() {
         editingRetouchId = null;
@@ -2154,11 +2031,8 @@ body::after {
                         <div class="job-detail">
                             📸 ${job.photos} foto${job.photos !== 1 ? "s" : ""}
                             <br>
-                            🖥️ Retoque:
-                            ${formatDateText(job.retouchDate)}
-                            <br>
-                            📤 Entrega:
-                            ${formatDateText(job.deliveryDate)}
+                            <span class="ak-icon" data-ak-icon="calendar"></span> Entrega:
+                            ${formatDateText(job.deliveryDate || job.retouchDate)}
                         </div>
 
                         ${!isCompleted ? `
@@ -2876,5 +2750,103 @@ body::after {
 
 </script>
 
-</body>
+
+<script>
+(function(){
+  const ICONS={
+    "📸":["M4 7h4l1.5-2h5L16 7h4v12H4z","circle",12,13,3.5],
+    "🎨":["M12 3a9 9 0 1 0 9 9c0-1.7-1.3-3-3-3h-1.5a2.5 2.5 0 0 1-2.5-2.5V5.9A3 3 0 0 0 12 3Z"],
+    "🎬":["M4 6h16v14H4z","M4 10h16","M8 6l1-3h2l1 3","M9 14l5 3-5 3z"],
+    "📚":["M5 4h13v15H5z","M3 6h2v15h13","M8 8h7","M8 12h7"],
+    "🔎":["circle",11,11,6,"M16 16l5 5"],
+    "🎯":["circle",12,12,8,"circle2",12,12,3,"M12 2v4","M12 18v4","M2 12h4","M18 12h4"],
+    "📊":["M5 20V10","M12 20V4","M19 20V7"],
+    "📅":["M3 5h18v16H3z","M16 3v4","M8 3v4","M3 10h18"],
+    "📌":["M8 3h8l1 5-3 3v7l-2 2-2-2v-7L7 8z","M12 20v2"],
+    "📤":["M12 16V3","M7 8l5-5 5 5","M4 13v7h16v-7"],
+    "🖥️":["M4 4h16v12H4z","M8 20h8","M12 16v4"],
+    "🗑️":["M5 7h14","M9 7V4h6v3","M7 7l1 13h8l1-13","M10 10v7","M14 10v7"],
+    "✏️":["M4 20h4L19 9l-4-4L4 16z","M13 6l4 4"],
+    "🧠":["M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 3 5h2V4z","M15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-3 5h-2V4z","M9 9h6","M9 13h6"],
+    "💡":["M9 18h6","M10 21h4","M8 14a5 5 0 1 1 8 0c-1 1-1.5 2-1.5 4h-5c0-2-.5-3-1.5-4z"],
+    "🚨":["M12 3l9 17H3z","M12 9v5","M12 18h.01"],
+    "🔴":["circle",12,12,7],
+    "🟠":["circle",12,12,7],
+    "🟢":["circle",12,12,7],
+    "😌":["circle",12,12,9,"M8 13q4 3 8 0","M8 9h.01","M16 9h.01"],
+    "🎉":["M4 20L14 4","M7 17l-3 3","M14 4l2-1","M18 6l2-2","M17 11l4 1","M18 15l3 3"],
+    "🎁":["M4 9h16v11H4z","M3 6h18v3H3z","M12 6v14","M12 6c-3 0-5-1-5-3s3-2 5 3","M12 6c3 0 5-1 5-3s-3-2-5 3"],
+    "☀️":["circle",12,12,4,"M12 2v3","M12 19v3","M2 12h3","M19 12h3","M4.9 4.9l2.1 2.1","M17 17l2.1 2.1","M19.1 4.9L17 7","M7 17l-2.1 2.1"],
+    "🌤️":["circle",10,10,4,"M15 16h4a3 3 0 0 0 0-6 4.5 4.5 0 0 0-8-2"],
+    "🌙":["M19 15a7 7 0 1 1-10-10 7 7 0 0 0 10 10z"],
+    "☑️":["M4 4h16v16H4z","M7 12l3 3 7-7"],
+    "☐":["M5 5h14v14H5z"],
+    "✓":["M5 12l4 4L19 6"],
+    "🔔":["M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9","M10 21h4"],
+    "💰":["circle",12,12,9,"M12 7v10","M9 10c0-2 6-2 6 0s-6 2-6 4 6 2 6 0"],
+    "📄":["M6 3h9l3 3v15H6z","M15 3v4h4"],
+    "🔗":["M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1","M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"]
+  };
+  ICONS.camera=ICONS["📸"];
+  ICONS.palette=ICONS["🎨"];
+  ICONS.video=ICONS["🎬"];
+  ICONS.history=ICONS["📚"];
+  ICONS.search=ICONS["🔎"];
+  ICONS.calendar=ICONS["📅"];
+  ICONS.brain=ICONS["🧠"];
+
+  function makeIcon(key){
+    const data=ICONS[key]||ICONS["📄"];
+    const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox","0 0 24 24"); svg.setAttribute("fill","none"); svg.setAttribute("stroke","currentColor"); svg.setAttribute("stroke-width","1.8"); svg.setAttribute("stroke-linecap","round"); svg.setAttribute("stroke-linejoin","round");
+    for(const item of data){
+      if(typeof item!=="string") continue;
+      const m=item.match(/^circle2$/);
+      if(m) continue;
+      if(item==="circle"){ const i=data.indexOf(item); const el=document.createElementNS("http://www.w3.org/2000/svg","circle"); el.setAttribute("cx",data[i+1]); el.setAttribute("cy",data[i+2]); el.setAttribute("r",data[i+3]); svg.appendChild(el); continue; }
+      if(item.startsWith("circle")) continue;
+      const pts=item.match(/^M/); if(pts){ const p=document.createElementNS("http://www.w3.org/2000/svg","path"); p.setAttribute("d",item); svg.appendChild(p); }
+    }
+    return svg;
+  }
+  function replace(root){
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+      if(!n.nodeValue || !/[☀-⛿🌙🌤️📸🎨🎬📚🔎🎯📊📅📌📤🖥️🗑️✏️🧠💡🚨🔴🟠🟢😌🎉🎁☑️☐✓🔔💰📄🔗]/u.test(n.nodeValue)) return NodeFilter.FILTER_REJECT;
+      if(n.parentElement && n.parentElement.closest("script,style,textarea,input,select,option")) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }});
+    const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+    for(const node of nodes){
+      const frag=document.createDocumentFragment();
+      let text=node.nodeValue, pos=0;
+      const re=/☀️|🌤️|🌙|📸|🎨|🎬|📚|🔎|🎯|📊|📅|📌|📤|🖥️|🗑️|✏️|🧠|💡|🚨|🔴|🟠|🟢|😌|🎉|🎁|☑️|☐|✓|🔔|💰|📄|🔗/gu;
+      let m;
+      while((m=re.exec(text))){ if(m.index>pos) frag.appendChild(document.createTextNode(text.slice(pos,m.index))); const span=document.createElement("span"); span.className="ak-icon"; span.setAttribute("aria-hidden","true"); span.appendChild(makeIcon(m[0])); frag.appendChild(span); pos=m.index+m[0].length; }
+      if(pos<text.length) frag.appendChild(document.createTextNode(text.slice(pos)));
+      node.parentNode.replaceChild(frag,node);
+    }
+  }
+  function convertMarkedIcons(root=document){
+    root.querySelectorAll && root.querySelectorAll("[data-ak-icon]").forEach(el=>{
+      if(el.dataset.akReady) return;
+      el.dataset.akReady="1";
+      el.appendChild(makeIcon(el.getAttribute("data-ak-icon")));
+    });
+  }
+  function init(){
+    replace(document.body);
+    convertMarkedIcons(document);
+    const obs=new MutationObserver(mutations=>{
+      for(const m of mutations){
+        for(const n of m.addedNodes){
+          if(n.nodeType===1){ replace(n); convertMarkedIcons(n); }
+        }
+      }
+    });
+    obs.observe(document.body,{childList:true,subtree:true});
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init); else init();
+})();
+
+</script>\n</body>
 </html>
