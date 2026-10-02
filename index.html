@@ -576,6 +576,131 @@
             margin-bottom: 18px;
         }
 
+        /* Listas compactas para móvil */
+        .compact-list {
+            display: grid;
+            gap: 7px;
+        }
+
+        .compact-item {
+            background: #19191d;
+            border: 1px solid #2b2b31;
+            border-radius: 13px;
+            overflow: hidden;
+        }
+
+        .compact-row {
+            width: 100%;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            border: 0;
+            background: transparent;
+            color: #fff;
+            text-align: left;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        .compact-chevron {
+            width: 18px;
+            color: #8f8f98;
+            font-size: 13px;
+            flex: 0 0 18px;
+            text-align: center;
+        }
+
+        .compact-name {
+            flex: 1;
+            min-width: 0;
+            font-size: 15px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex: 0 0 9px;
+        }
+
+        .status-dot.green { background: #72db8a; }
+        .status-dot.orange { background: #ffc766; }
+        .status-dot.red, .status-dot.overdue { background: #ff6b6b; }
+
+        .compact-body {
+            display: none;
+            padding: 0 12px 12px 39px;
+            border-top: 1px solid #292930;
+        }
+
+        .compact-item.open .compact-body {
+            display: block;
+        }
+
+        .compact-meta {
+            color: #aaaab2;
+            font-size: 12px;
+            line-height: 1.7;
+            padding-top: 9px;
+        }
+
+        .compact-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 9px;
+            flex-wrap: wrap;
+        }
+
+        .compact-category {
+            margin: 15px 0 7px;
+            border: 1px solid #2b2b31;
+            border-radius: 13px;
+            overflow: hidden;
+            background: #19191d;
+        }
+
+        .category-row {
+            width: 100%;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 13px;
+            border: 0;
+            background: transparent;
+            color: #fff;
+            font: inherit;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .category-row .count {
+            margin-left: auto;
+            color: #777780;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .category-items {
+            display: none;
+            padding: 0 8px 8px;
+        }
+
+        .compact-category.open .category-items { display: grid; gap: 6px; }
+
+        .compact-category .compact-item { border-radius: 10px; }
+
+        .completed-compact { opacity: .65; }
+
+
 
         .dashboard-grid {
             display: grid;
@@ -1083,7 +1208,6 @@ body::after {
         </div>
 
         <button class="new-button" onclick="showNewDesign()">＋ NUEVO DISEÑO</button>
-        <div class="auto-note">💡 Las portadas de cada sesión de fotos se agregan automáticamente aquí. Quedan ordenadas por fecha de sesión, de la más antigua a la más reciente.</div>
         <div id="designList"></div>
     </section>
 
@@ -1106,6 +1230,7 @@ body::after {
                     <option value="flyer">Flyer</option>
                     <option value="logo">Logo</option>
                     <option value="imprenta">Imprenta</option>
+                    <option value="otros">Otros</option>
                 </select>
             </div>
             <div class="field">
@@ -1438,7 +1563,16 @@ body::after {
         portada: "Portada",
         flyer: "Flyer",
         logo: "Logo",
-        imprenta: "Imprenta"
+        imprenta: "Imprenta",
+        otros: "Otros"
+    };
+
+    const designCategoryLabels = {
+        portada: "PORTADAS",
+        flyer: "FLYER",
+        logo: "LOGO",
+        imprenta: "IMPRENTA",
+        otros: "OTROS"
     };
 
     const videoLabels = {
@@ -1526,58 +1660,84 @@ body::after {
         openSection("designs");
     }
 
+    let openRetouchId = null;
+    let openDesignId = null;
+    let openDesignCategory = null;
+
+    function toggleRetouchOpen(id) {
+        openRetouchId = openRetouchId === id ? null : id;
+        renderRetouches();
+    }
+
+    function toggleDesignOpen(id) {
+        openDesignId = openDesignId === id ? null : id;
+        renderDesigns();
+    }
+
+    function toggleDesignCategory(type) {
+        openDesignCategory = openDesignCategory === type ? null : type;
+        renderDesigns();
+    }
+
     function renderDesigns() {
         const container = document.getElementById("designList");
         if (!container) return;
 
         const active = designs.filter(x => !x.completed);
         const completed = designs.filter(x => x.completed);
+        const types = ["portada", "flyer", "logo", "imprenta", "otros"];
         let html = "";
 
-        ["portada", "flyer", "logo", "imprenta"].forEach(type => {
-            const items = active.filter(x => x.type === type);
-            if (!items.length) return;
-            html += `<div class="category-title">${designLabels[type]}${type === "portada" ? " · por fecha de sesión" : ""}</div>`;
+        types.forEach(type => {
+            const items = active.filter(x => (x.type || "otros") === type);
             if (type === "portada") {
                 items.sort((a,b) => String(a.sessionDate || a.createdAt).localeCompare(String(b.sessionDate || b.createdAt)));
             }
-            html += items.map(renderDesignCard).join("");
+            const isOpen = openDesignCategory === type;
+            html += `
+                <div class="compact-category ${isOpen ? "open" : ""}">
+                    <button class="category-row" onclick="toggleDesignCategory('${type}')">
+                        <span class="compact-chevron">${isOpen ? "▾" : "▸"}</span>
+                        <span>${designCategoryLabels[type]}</span>
+                        <span class="count">${items.length}</span>
+                    </button>
+                    <div class="category-items">
+                        ${items.length ? items.map(renderDesignCompact).join("") : `<div class="compact-meta" style="padding:8px 8px 6px;">Sin diseños pendientes.</div>`}
+                    </div>
+                </div>`;
         });
-
-        if (!active.length) {
-            html += `<div class="empty">No tienes diseños pendientes.<br><br>Pulsa <b>＋ NUEVO DISEÑO</b> para comenzar.</div>`;
-        }
 
         if (completed.length) {
             html += `<div class="completed-title"><button class="completed-toggle" onclick="toggleDesignCompletedList()">☑️ DISEÑOS TERMINADOS (${completed.length}) <span id="designCompletedArrow">▾</span></button></div>`;
             const open = localStorage.getItem("akreativeDesignCompletedOpen") !== "false";
-            html += `<div id="designCompletedList" class="completed-list ${open ? "" : "collapsed"}">`;
-            html += completed.map(renderDesignCard).join("");
-            html += `</div>`;
+            html += `<div id="designCompletedList" class="completed-list ${open ? "" : "collapsed"}"><div class="compact-list">`;
+            html += completed.map(item => renderDesignCompact(item, true)).join("");
+            html += `</div></div>`;
         }
+
         container.innerHTML = html;
     }
 
-    function renderDesignCard(item) {
-        return `<div class="job ${item.completed ? "completed-card" : ""}">
-            <div class="job-top">
-                <div class="check-wrap">
-                    <button class="check ${item.completed ? "done" : ""}" onclick="toggleDesign(${item.id})">${item.completed ? "✓" : "□"}</button>
-                    <div class="check-label">${item.completed ? "Terminado" : "Marcar terminado"}</div>
+    function renderDesignCompact(item, completedOverride = false) {
+        const completed = completedOverride || item.completed;
+        const open = openDesignId === item.id;
+        const safeName = escapeHtml(item.artist || "Sin nombre");
+        return `<div class="compact-item ${completed ? "completed-compact" : ""} ${open ? "open" : ""}">
+            <button class="compact-row" onclick="toggleDesignOpen(${item.id})">
+                <span class="compact-chevron">${open ? "▾" : "▸"}</span>
+                <span class="compact-name">${safeName}</span>
+                ${completed ? `<span class="status-dot green" title="Terminado"></span>` : ""}
+            </button>
+            <div class="compact-body">
+                <div class="compact-meta">
+                    ${designLabels[item.type] || item.type || "Diseño"}<br>
+                    📅 Entrega: ${item.deliveryDate ? formatDateText(item.deliveryDate) : "Por definir"}
+                    ${item.auto ? `<br>🎁 Portada creada automáticamente` : ""}
                 </div>
-                <div class="job-info">
-                    <div class="job-head">
-                        <div>
-                            <div class="artist">${escapeHtml(item.artist)}</div>
-                            <div class="work-type">${designLabels[item.type] || item.type}</div>
-                        </div>
-                        <div class="job-actions">
-                            <button class="edit-button" onclick="editDesign(${item.id})">✏️ Editar</button>
-                            ${!item.auto ? `<button class="delete-button" onclick="deleteDesign(${item.id})">🗑️ Eliminar</button>` : ""}
-                        </div>
-                    </div>
-                    <div class="job-detail">📅 Entrega: <span class="muted">${item.deliveryDate ? formatDateText(item.deliveryDate) : "Por definir"}</span></div>
-                    ${item.auto ? `<div class="type-badge">🎁 Obsequio de sesión</div>` : ""}
+                <div class="compact-actions">
+                    <button class="edit-button" onclick="event.stopPropagation(); editDesign(${item.id})">✏️ Editar</button>
+                    ${!item.auto ? `<button class="delete-button" onclick="event.stopPropagation(); deleteDesign(${item.id})">🗑️ Eliminar</button>` : ""}
+                    <button class="edit-button" onclick="event.stopPropagation(); toggleDesign(${item.id})">${completed ? "↩️ Reabrir" : "✓ Terminar"}</button>
                 </div>
             </div>
         </div>`;
@@ -1794,21 +1954,26 @@ body::after {
     }
 
 
-    function findNextFreeDeliveryDate() {
-        let candidate = addDays(new Date(), 1);
+    function findNextFreeDeliveryDate(sessionDateValue) {
+        let base = sessionDateValue ? new Date(sessionDateValue + "T12:00:00") : new Date();
+        base.setHours(12,0,0,0);
+        let candidate = addDays(base, 2);
+
         while (true) {
             const candidateString = formatDateInput(candidate);
+            const isSunday = candidate.getDay() === 0;
             const occupied = retouches.some(job =>
                 !job.completed &&
                 (job.deliveryDate === candidateString || job.retouchDate === candidateString)
             );
-            if (!occupied) return candidate;
+            if (!isSunday && !occupied) return candidate;
             candidate = addDays(candidate, 1);
         }
     }
 
     function calculateSuggestedDates() {
-        const suggestedDelivery = findNextFreeDeliveryDate();
+        const sessionDate = document.getElementById("sessionDate")?.value;
+        const suggestedDelivery = findNextFreeDeliveryDate(sessionDate);
         document.getElementById("suggestedDelivery").textContent = formatPrettyDate(suggestedDelivery);
         document.getElementById("deliveryDate").value = formatDateInput(suggestedDelivery);
     }
@@ -1913,144 +2078,55 @@ body::after {
     // -----------------------------
 
     function renderRetouches() {
-
-        const container =
-            document.getElementById("retouchList");
+        const container = document.getElementById("retouchList");
+        if (!container) return;
 
         if (retouches.length === 0) {
-
-            container.innerHTML = `
-                <div class="empty">
-                    📸 Todavía no tienes retoques registrados.
-                    <br><br>
-                    Pulsa <b>＋ NUEVO RETOQUE</b> para comenzar.
-                </div>
-            `;
-
+            container.innerHTML = `<div class="empty">📸 Todavía no tienes retoques registrados.<br><br>Pulsa <b>＋ NUEVO RETOQUE</b> para comenzar.</div>`;
             return;
         }
 
-        const pending =
-            retouches
-                .filter(job => !job.completed)
-                .sort((a, b) =>
-                    new Date(a.deliveryDate) -
-                    new Date(b.deliveryDate)
-                );
-
-        const completed =
-            retouches
-                .filter(job => job.completed)
-                .sort((a, b) =>
-                    new Date(b.deliveryDate) -
-                    new Date(a.deliveryDate)
-                );
-
+        const pending = retouches.filter(job => !job.completed).sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
+        const completed = retouches.filter(job => job.completed).sort((a,b) => new Date(b.deliveryDate) - new Date(a.deliveryDate));
         let html = "";
 
-        if (pending.length === 0) {
-            html += `
-                <div class="empty">
-                    🎉 ¡No tienes retoques pendientes!
-                    <br><br>
-                    Todo está terminado.
-                </div>
-            `;
+        if (pending.length) {
+            html += `<div class="compact-list">${pending.map(job => renderRetouchCompact(job, false)).join("")}</div>`;
         } else {
-            html += pending.map(job => renderJobCard(job, false)).join("");
+            html += `<div class="empty">🎉 ¡No tienes retoques pendientes!<br><br>Todo está terminado.</div>`;
         }
 
-        if (completed.length > 0) {
+        if (completed.length) {
             const completedOpen = localStorage.getItem("akreativeCompletedOpen") !== "false";
-            html += `
-                <div class="completed-title">
-                    <button class="completed-toggle" onclick="toggleCompleted()">
-                        ☑️ TRABAJOS TERMINADOS (${completed.length})
-                        <span>${completedOpen ? "▾" : "▸"}</span>
-                    </button>
-                </div>
-                <div class="completed-list ${completedOpen ? "" : "collapsed"}">
-                    ${completed.map(job => renderJobCard(job, true)).join("")}
-                </div>
-            `;
+            html += `<div class="completed-title"><button class="completed-toggle" onclick="toggleCompleted()">☑️ TRABAJOS TERMINADOS (${completed.length}) <span>${completedOpen ? "▾" : "▸"}</span></button></div>`;
+            html += `<div class="completed-list ${completedOpen ? "" : "collapsed"}"><div class="compact-list">${completed.map(job => renderRetouchCompact(job, true)).join("")}</div></div>`;
         }
 
         container.innerHTML = html;
     }
 
-
-    function renderJobCard(job, isCompleted) {
-
-        const status =
-            getStatus(job.deliveryDate);
-
-        return `
-            <div class="job ${isCompleted ? "completed-card" : ""}">
-
-                <div class="job-top">
-
-                    <div class="check-wrap">
-                        <button
-                            class="check ${isCompleted ? "done" : ""}"
-                            onclick="completeRetouch(${job.id})"
-                            aria-label="${isCompleted ? "Terminado" : "Marcar como terminado"}"
-                            title="${isCompleted ? "Terminado" : "Marcar como terminado"}"
-                        >
-                            ${isCompleted ? "✓" : "☐"}
-                        </button>
-                        <div class="check-label">
-                            ${isCompleted ? "Terminado" : "Marcar terminado"}
-                        </div>
-                    </div>
-
-                    <div class="job-info">
-
-                        <div class="job-head">
-                            <div class="artist">
-                                ${escapeHtml(job.artist)}
-                            </div>
-
-                            <div class="job-actions">
-                                <button
-                                    class="edit-button"
-                                    onclick="editRetouch(${job.id})"
-                                    title="Editar retoque"
-                                >
-                                    ✏️ Editar
-                                </button>
-                                <button
-                                    class="delete-button"
-                                    onclick="deleteRetouch(${job.id})"
-                                    title="Eliminar retoque"
-                                >
-                                    🗑️ Eliminar
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="job-detail">
-                            📸 ${job.photos} foto${job.photos !== 1 ? "s" : ""}
-                            <br>
-                            <span class="ak-icon" data-ak-icon="calendar"></span> Entrega:
-                            ${formatDateText(job.deliveryDate || job.retouchDate)}
-                        </div>
-
-                        ${!isCompleted ? `
-                            <span class="status ${status.className}">
-                                ${status.text}
-                            </span>
-                        ` : `
-                            <span class="status green">
-                                ☑️ TERMINADO
-                            </span>
-                        `}
-
-                    </div>
-
+    function renderRetouchCompact(job, isCompleted) {
+        const status = getStatus(job.deliveryDate || job.retouchDate);
+        const open = openRetouchId === job.id;
+        return `<div class="compact-item ${isCompleted ? "completed-compact" : ""} ${open ? "open" : ""}">
+            <button class="compact-row" onclick="toggleRetouchOpen(${job.id})">
+                <span class="compact-chevron">${open ? "▾" : "▸"}</span>
+                <span class="compact-name">${escapeHtml(job.artist || "Sin nombre")}</span>
+                ${isCompleted ? `<span class="status-dot green" title="Terminado"></span>` : `<span class="status-dot ${status.className}" title="${escapeHtml(status.text)}"></span>`}
+            </button>
+            <div class="compact-body">
+                <div class="compact-meta">
+                    📸 ${job.photos} foto${job.photos !== 1 ? "s" : ""}<br>
+                    <span class="ak-icon" data-ak-icon="calendar"></span> Entrega: ${formatDateText(job.deliveryDate || job.retouchDate)}<br>
+                    ${isCompleted ? "☑️ Terminado" : status.text}
                 </div>
-
+                <div class="compact-actions">
+                    <button class="check ${isCompleted ? "done" : ""}" onclick="event.stopPropagation(); completeRetouch(${job.id})">${isCompleted ? "✓" : "☐"}</button>
+                    <button class="edit-button" onclick="event.stopPropagation(); editRetouch(${job.id})">✏️ Editar</button>
+                    <button class="delete-button" onclick="event.stopPropagation(); deleteRetouch(${job.id})">🗑️ Eliminar</button>
+                </div>
             </div>
-        `;
+        </div>`;
     }
 
     // -----------------------------
@@ -2058,68 +2134,22 @@ body::after {
     // -----------------------------
 
     function getStatus(deliveryDate) {
-
-        const today =
-            new Date();
-
+        const today = new Date();
         today.setHours(0,0,0,0);
+        const delivery = new Date(deliveryDate + "T00:00:00");
+        const difference = Math.ceil((delivery - today) / (1000 * 60 * 60 * 24));
 
-
-        const delivery =
-            new Date(deliveryDate + "T00:00:00");
-
-        const difference =
-            Math.ceil(
-                (delivery - today) /
-                (1000 * 60 * 60 * 24)
-            );
-
-
-        if (difference < 0) {
-
-            const days =
-                Math.abs(difference);
-
+        if (difference <= 0) {
             return {
-                className: "overdue",
-                text: `🚨 VENCIDO · ${days} día${days !== 1 ? "s" : ""}`
+                className: difference < 0 ? "overdue" : "red",
+                text: difference < 0 ? `🔴 RETRASADO · ${Math.abs(difference)} día${Math.abs(difference) !== 1 ? "s" : ""}` : "🔴 ENTREGA HOY"
             };
         }
-
-
-        if (difference === 0) {
-
-            return {
-                className: "red",
-                text: "🔴 ENTREGA HOY"
-            };
+        if (difference <= 2) {
+            return { className: "orange", text: `🟠 FALTAN ${difference} DÍA${difference !== 1 ? "S" : ""}` };
         }
-
-
-        if (difference === 1) {
-
-            return {
-                className: "red",
-                text: "🔴 ENTREGA MAÑANA"
-            };
-        }
-
-
-        if (difference <= 3) {
-
-            return {
-                className: "orange",
-                text: `🟠 FALTAN ${difference} DÍAS`
-            };
-        }
-
-
-        return {
-            className: "green",
-            text: `🟢 FALTAN ${difference} DÍAS`
-        };
+        return { className: "green", text: `🟢 FALTAN ${difference} DÍAS` };
     }
-
 
     function toggleCompleted() {
         const current = localStorage.getItem("akreativeCompletedOpen") !== "false";
@@ -2834,6 +2864,9 @@ body::after {
     });
   }
   function init(){
+    const sessionInput = document.getElementById("sessionDate");
+    if (sessionInput) sessionInput.addEventListener("change", calculateSuggestedDates);
+    setupOptionalDateControls();
     replace(document.body);
     convertMarkedIcons(document);
     const obs=new MutationObserver(mutations=>{
