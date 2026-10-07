@@ -1771,7 +1771,7 @@ body::after {
                 <div class="compact-actions">
                     <button class="edit-button" onclick="event.stopPropagation(); editDesign(${item.id})">✏️ Editar</button>
                     ${!item.auto ? `<button class="delete-button" onclick="event.stopPropagation(); deleteDesign(${item.id})">🗑️ Eliminar</button>` : ""}
-                    <button class="edit-button" onclick="event.stopPropagation(); toggleDesign(${item.id})">${completed ? "↩️ Reabrir" : "✓ Terminar"}</button>
+                    <button class="edit-button" onclick="event.stopPropagation(); toggleDesign(${item.id})">${completed ? "↩️ Reabrir" : "✓ Listo"}</button>
                 </div>
             </div>
         </div>`;
