@@ -2695,7 +2695,6 @@ body::after {
             label: `DISEÑO · ${designLabels[x.type] || x.type || "Diseño"}`,
             icon: "🎨",
             id: x.id,
-            id: x.id,
             name: x.artist || "Sin nombre",
             date: x.deliveryDate || x.createdAt,
             extra: x.deliveryDate ? `Entrega: ${formatDateText(x.deliveryDate)}` : "Entrega: Por definir"
@@ -2705,6 +2704,7 @@ body::after {
             type: "video",
             label: `VIDEO · ${videoLabels[x.type] || x.type || "Video"}`,
             icon: "🎬",
+            id: x.id,
             name: x.artist || "Sin nombre",
             date: x.deliveryDate || x.createdAt,
             extra: x.deliveryDate ? `Entrega: ${formatDateText(x.deliveryDate)}` : "Entrega: Por definir"
@@ -2712,8 +2712,8 @@ body::after {
 
         const filtered = all.filter(x => {
             const matchesFilter = historyFilter === "all" || x.type === historyFilter;
-            const text = `${x.name} ${x.label} ${x.extra}`.toLowerCase();
-            return matchesFilter && (!query || text.includes(query));
+            const searchText = `${x.name} ${x.label} ${x.extra}`.toLowerCase();
+            return matchesFilter && (!query || searchText.includes(query));
         }).sort((a,b) => String(b.date || "").localeCompare(String(a.date || "")));
 
         if (!filtered.length) {
@@ -2722,15 +2722,13 @@ body::after {
         }
 
         container.innerHTML = filtered.map(x => `
-            <div class="history-card" onclick="openJobDetail('${x.type}', ${x.id})">
-                <div class="history-type">${x.icon} ${escapeHtml(x.label)}</div>
-                <div class="history-name">${escapeHtml(x.name)}</div>
-                <div class="history-meta">
-                    ${x.extra}<br>
-                    📅 ${x.date ? formatDateText(x.date) : "Fecha no registrada"}
-                    <br>✓ TERMINADO
-                    <div style="margin-top:8px;color:#aaa;font-size:12px;">Toca para ver detalles →</div>
-                </div>
+            <div class="compact-item history-compact-item">
+                <button class="compact-row" onclick="openJobDetail('${x.type}', ${x.id})">
+                    <span class="compact-chevron">›</span>
+                    <span class="compact-name">${escapeHtml(x.name)}</span>
+                    <span style="color:#8f8f98;font-size:11px;white-space:nowrap;">${escapeHtml(x.label.replace(/^.*?· /, ""))}</span>
+                    <span class="status-dot green" title="Terminado"></span>
+                </button>
             </div>
         `).join("");
     }
