@@ -1081,9 +1081,42 @@ body::after {
 .detail-title{font-size:20px;font-weight:800;margin:0}.detail-sub{color:#aaa;font-size:13px;margin-top:4px}
 .detail-grid{display:grid;gap:10px;margin-top:16px}.detail-row{background:#222;border-radius:13px;padding:12px 14px}.detail-label{font-size:11px;text-transform:uppercase;color:#999;letter-spacing:.4px}.detail-value{font-size:15px;margin-top:3px;font-weight:600}
 </style>
+
+<style id="ak-toast-style">
+#akToast{
+  position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);
+  background:rgba(18,18,18,.96);color:#fff;border:1px solid #3a3a3a;
+  border-radius:12px;padding:12px 18px;box-shadow:0 10px 30px rgba(0,0,0,.55);
+  font-size:14px;font-weight:700;letter-spacing:.2px;z-index:99999;
+  opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+  max-width:min(90vw,520px);text-align:center;
+}
+#akToast.show{opacity:1;transform:translate(-50%,0);}
+#akToast.error{border-color:#6b2b2b;}
+@media(max-width:600px){
+  #akToast{bottom:18px;font-size:13px;padding:11px 15px;max-width:88vw;}
+}
+</style>
 </head>
 
 <body>
+
+<div id="akToast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  let akToastTimer=null;
+  window.showToast=function(message,type="success"){
+    const el=document.getElementById("akToast");
+    if(!el) return;
+    clearTimeout(akToastTimer);
+    el.textContent=(type==="error" ? "⚠️ " : "✓ ")+String(message);
+    el.classList.toggle("error",type==="error");
+    el.classList.add("show");
+    akToastTimer=setTimeout(()=>el.classList.remove("show"),2600);
+  };
+})();
+</script>
+
 
 <main class="app">
 
@@ -1600,7 +1633,7 @@ body::after {
         const noDate = document.getElementById("designNoDate").checked;
         const deliveryDate = noDate ? null : document.getElementById("designDeliveryDate").value || null;
         if (!artist) {
-            alert("Escribe el nombre del artista.");
+            showToast("Escribe el nombre del artista.");
             return;
         }
 
@@ -1612,7 +1645,7 @@ body::after {
             item.deliveryDate = deliveryDate;
             localStorage.setItem("akreativeDesigns", JSON.stringify(designs));
             editingDesignId = null;
-            alert("✅ Cambios guardados.");
+            showToast("✅ Cambios guardados.");
             openSection("designs");
             return;
         }
@@ -1629,7 +1662,7 @@ body::after {
             sourceRetouchId: null
         });
         localStorage.setItem("akreativeDesigns", JSON.stringify(designs));
-        alert("✅ Diseño agregado a tu agenda.");
+        showToast("✅ Diseño agregado a tu agenda.");
         openSection("designs");
     }
 
@@ -1774,7 +1807,7 @@ body::after {
         const noDate = document.getElementById("videoNoDate").checked;
         const deliveryDate = noDate ? null : document.getElementById("videoDeliveryDate").value || null;
         if (!artist) {
-            alert("Escribe el nombre del artista.");
+            showToast("Escribe el nombre del artista.");
             return;
         }
 
@@ -1786,7 +1819,7 @@ body::after {
             item.deliveryDate = deliveryDate;
             localStorage.setItem("akreativeVideos", JSON.stringify(videos));
             editingVideoId = null;
-            alert("✅ Cambios guardados.");
+            showToast("✅ Cambios guardados.");
             openSection("videos");
             return;
         }
@@ -1798,7 +1831,7 @@ body::after {
             completed: false
         });
         localStorage.setItem("akreativeVideos", JSON.stringify(videos));
-        alert("✅ Video agregado a tu agenda.");
+        showToast("✅ Video agregado a tu agenda.");
         openSection("videos");
     }
 
@@ -2011,8 +2044,8 @@ body::after {
         const sessionDate = document.getElementById("sessionDate").value;
         const deliveryDate = document.getElementById("deliveryDate").value;
 
-        if (!artist) { alert("Escribe el nombre del artista."); return; }
-        if (!deliveryDate) { alert("Selecciona la fecha de entrega."); return; }
+        if (!artist) { showToast("Escribe el nombre del artista."); return; }
+        if (!deliveryDate) { showToast("Selecciona la fecha de entrega."); return; }
 
         if (editingRetouchId !== null) {
             const job = retouches.find(item => item.id === editingRetouchId);
@@ -2024,7 +2057,7 @@ body::after {
             job.deliveryDate = deliveryDate;
             localStorage.setItem("akreativeRetouches", JSON.stringify(retouches));
             editingRetouchId = null;
-            alert("Cambios guardados.");
+            showToast("Cambios guardados.");
             openSection("retouches");
             return;
         }
@@ -2054,7 +2087,7 @@ body::after {
 
         localStorage.setItem("akreativeRetouches", JSON.stringify(retouches));
         localStorage.setItem("akreativeDesigns", JSON.stringify(designs));
-        alert("Retoque agregado a tu agenda.");
+        showToast("Retoque agregado a tu agenda.");
         openSection("retouches");
     }
 
@@ -2630,7 +2663,7 @@ body::after {
 
         // Las portadas automáticas se eliminan desde su retoque.
         if (item.auto) {
-            alert("Esta portada se creó automáticamente con el retoque. Elimínala desde el retoque correspondiente.");
+            showToast("Esta portada se creó automáticamente con el retoque. Elimínala desde el retoque correspondiente.");
             return;
         }
 
