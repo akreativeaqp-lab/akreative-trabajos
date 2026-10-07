@@ -1661,6 +1661,7 @@ body::after {
     }
 
     let openRetouchId = null;
+    let openVideoId = null;
     let openDesignId = null;
     let openDesignCategory = null;
 
@@ -1838,38 +1839,47 @@ body::after {
             const items = active.filter(x => x.type === type);
             if (!items.length) return;
             html += `<div class="category-title">${videoLabels[type]}</div>`;
-            html += items.map(renderVideoCard).join("");
+            html += `<div class="compact-list">${items.map(renderVideoCard).join("")}</div>`;
         });
         if (!active.length) html += `<div class="empty">No tienes videos pendientes.<br><br>Pulsa <b>＋ NUEVO VIDEO</b> para comenzar.</div>`;
         if (completed.length) {
             html += `<div class="completed-title"><button class="completed-toggle" onclick="toggleVideoCompletedList()">☑️ VIDEOS TERMINADOS (${completed.length}) <span>▾</span></button></div>`;
             const open = localStorage.getItem("akreativeVideoCompletedOpen") !== "false";
-            html += `<div id="videoCompletedList" class="completed-list ${open ? "" : "collapsed"}">`;
+            html += `<div id="videoCompletedList" class="completed-list ${open ? "" : "collapsed"}"><div class="compact-list">`;
             html += completed.map(renderVideoCard).join("");
-            html += `</div>`;
+            html += `</div></div>`;
         }
         container.innerHTML = html;
     }
 
+    function toggleVideoOpen(id) {
+        openVideoId = openVideoId === id ? null : id;
+        renderVideos();
+    }
+
     function renderVideoCard(item) {
-        return `<div class="job ${item.completed ? "completed-card" : ""}">
-            <div class="job-top">
-                <div class="check-wrap">
-                    <button class="check ${item.completed ? "done" : ""}" onclick="toggleVideo(${item.id})">${item.completed ? "✓" : "□"}</button>
-                    <div class="check-label">${item.completed ? "Terminado" : "Marcar terminado"}</div>
+        const open = openVideoId === item.id;
+        const safeName = escapeHtml(item.artist || "Sin nombre");
+        const typeLabel = escapeHtml(videoLabels[item.type] || item.type || "Video");
+        const delivery = item.deliveryDate ? formatDateText(item.deliveryDate) : "Por definir";
+        return `<div class="compact-item ${item.completed ? "completed-compact" : ""} ${open ? "open" : ""}">
+            <button class="compact-row" onclick="toggleVideoOpen(${item.id})">
+                <span class="compact-chevron">${open ? "▾" : "▸"}</span>
+                <span class="compact-name">${safeName}</span>
+                <span style="color:#8f8f98;font-size:11px;white-space:nowrap;">${typeLabel}</span>
+                <span class="status-dot ${item.completed ? "green" : (item.deliveryDate ? getStatus(item.deliveryDate).className : "")}" title="${item.completed ? "Terminado" : "Video"}"></span>
+            </button>
+            <div class="compact-body">
+                <div class="compact-meta">
+                    🎬 ${typeLabel}<br>
+                    📅 Entrega: ${delivery}
+                    ${item.createdAt ? `<br>🗓️ Creado: ${formatDateText(item.createdAt)}` : ""}
+                    <br>${item.completed ? "☑️ Terminado" : "⏳ Pendiente"}
                 </div>
-                <div class="job-info">
-                    <div class="job-head">
-                        <div>
-                            <div class="artist">${escapeHtml(item.artist)}</div>
-                            <div class="work-type">${videoLabels[item.type] || item.type}</div>
-                        </div>
-                        <div class="job-actions">
-                            <button class="edit-button" onclick="editVideo(${item.id})">✏️ Editar</button>
-                            <button class="delete-button" onclick="deleteVideo(${item.id})">🗑️ Eliminar</button>
-                        </div>
-                    </div>
-                    <div class="job-detail">📅 Entrega: <span class="muted">${item.deliveryDate ? formatDateText(item.deliveryDate) : "Por definir"}</span></div>
+                <div class="compact-actions">
+                    <button class="edit-button" onclick="event.stopPropagation(); editVideo(${item.id})">✏️ Editar</button>
+                    <button class="delete-button" onclick="event.stopPropagation(); deleteVideo(${item.id})">🗑️ Eliminar</button>
+                    <button class="edit-button" onclick="event.stopPropagation(); toggleVideo(${item.id})">${item.completed ? "↩️ Reabrir" : "✓ Listo"}</button>
                 </div>
             </div>
         </div>`;
